@@ -1,0 +1,35 @@
+baseURL: 'https://example.org/'
+languageCode: 'en-us'
+paginatation:
+  pagerSize: 5
+
+theme: ["PaperMod"]
+
+preserveTaxonomyNames: true
+hasCJKLanguage: true
+enableEmoji: true
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+
+minify:
+  disableXML: true
+  # minifyOutput: true
+
+params:
+  title: "Compasty's Blog"
+  description: "Records of daily dev life, created by compasty"
+  keywords: [Blog, PaperMod]
+  author: compasty
+
+menu:
+  main:
+    - identifier: categories
+      name: categories
+      url: /categories/
+      weight: 10
+    - identifier: tags
+      name: tags
+      url: /tags/
+      weight: 20
