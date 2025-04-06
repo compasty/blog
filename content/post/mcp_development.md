@@ -34,11 +34,11 @@ MCP遵循CS(Client-Server)架构，其中主机应用程序可以连接到多个
 
 ![MCP Architecture](/images/ai/mcp_arch.png)
 
-+ **MCP Hosts**: MCP主机，希望通过MCP访问数据的程序，如Claude Desktop, AI Agent
-+ **MCP Client**: 与服务器保持 1:1 连接的协议客户端
-+ **MCP Servers**: 轻量级程序，每个程序都通过标准化模型上下文协议公开特定功能
++ **MCP Hosts**: MCP主机，表示希望通过MCP访问数据的程序，如Claude Desktop, AI Agent。主机通常会集成MCP客户端，客户端负责使用具体的MCP协议和服务器通信
++ **MCP Client**: 与服务器保持 1:1 连接的协议客户端，是MCP协议的具体实现。它们充当了主机和服务器之间的桥梁，负责传递请求和响应。
++ **MCP Servers**: 轻量级程序，每个程序都通过标准化模型上下文协议公开特定功能。- 一个服务器可以提供多个功能的集合，也可以专注于提供单个实用功能。
 + **Local Data Sources**: 本地数据源，MCP 服务器可以安全访问的您的计算机文件、数据库和服务
-+ **Remote Services**: MCP 服务器可通过互联网（例如通过 API）连接到的外部系统
++ **Remote Services**: MCP 服务器可通过互联网（例如通过 API）连接到的外部系统。
 
 # Hello, MCP
 

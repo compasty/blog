@@ -62,6 +62,11 @@ square.next_to(circle, RIGHT, buff=0.5)  # set the position
 
 `.animate`是`Mobject`实现动画效果的重要方法，将`.animate`添加到修改`Mobject`属性的方法调用之前，该方法将成为可以使用`self.play`播放的动画。
 
+
+## manim命令行
+
+使用
+
 # Manim示例
 
 
