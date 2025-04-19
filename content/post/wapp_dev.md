@@ -85,6 +85,7 @@ WXML类似html, 用来描述页面的结构，也是由标签、属性等等构�
 
 1. 标签名字不一样：小程序的 WXML 用的标签是`view`,`button`,`text`等等，这些标签就是小程序给开发者包装好的基本能力，我们还提供了地图、视频、音频等等组件能力。
 2. 支持`wx:if`等特殊的属性以及`{{ }}`这样的表达式
+3. WXML语言使用数据绑定功能来完成界面的实时更新，使用`{{变量名}}`来绑定WXML文件和对应JS文件中的data对象属性。用在属性值时，需注意**必须包裹在双引号**中。
 
 ```xml
 <view class="container">
@@ -100,6 +101,38 @@ WXML类似html, 用来描述页面的结构，也是由标签、属性等等构�
   </view>
 </view>
 ```
+
+> + wxml中的属性是大小写敏感的，也就是class和Class在wxml中是不同的属性
+> + 没有被定义的变量或者设置为undefined的变量不会被同步到WXML
+
+wxml的逻辑语法/条件逻辑/列表渲染
+
+```xml
+<text>{{ a == 10 ? "a is 10" : "a is not 10" }}</text>
+<!-- 支持运算和字符串拼接 -->
+<view>{{"hello " + name}}</view>
+<!-- 条件逻辑 -->
+<view wx:if="{{length > 5}}"> 1 </view>
+<view wx:else> 3 </view>
+<!-- 一次判断多个组件标签 -->
+<block wx:if="{{true}}">
+  <view> view1 </view>
+  <view> view2 </view>
+</block>
+<!-- 列表 -->
+<view wx:for="{{array}}">
+  {{index}}: {{item.message}}
+</view>
+<view wx:for="{{array}}" wx:for-index="idx" wx:for-item="itemName">
+  {{idx}}: {{itemName.message}}
+</view>
+```
+
+列表渲染：默认数组的当前项的下标变量名默认为 `index`，数组当前项的变量名默认为 `item`。可以使用`wx:for-item`指定数组当前元素的变量名，使用 `wx:for-index`指定数组当前下标的变量名。
+
+如果列表中的项
+
+
 
 ### WXSS样式
 
@@ -232,3 +265,222 @@ wx.scanCode({
 **发布**
 
 审核通过之后，管理员的微信中会收到小程序通过审核的通知。此时可以点击发布，即可发布小程序。小程序提供了两种发布模式：全量发布和分阶段发布（即灰度发布）。
+
+
+# 配置详解
+
+## 全局配置说明
+
+`app.json`文件用来对微信小程序进行全局配置。文件内容为一个 JSON 对象, 以下是一些常用的属性：
+
+```json
+{
+  // 包含的页面
+  "pages": [
+    "pages/home/home"
+  ],
+  "window": {
+    // 导航栏的颜色
+    "navigationBarBackgroundColor": "#ff0000",
+    // 导航栏文字颜色
+    "navigationBarTextStyle": "white",
+    // 导航栏的文字
+    "navigationBarTitleText": "小程序 Demo"     
+  }
+}
+```
+
+
+
+# 场景应用
+
+## 基本布局方法——Flex布局
+
+传统网页开发使用盒模型，如`display: inline|inline-box, position`等实现布局，缺乏灵活性。更建议使用flex布局。
+
+```css
+.container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+```
+
+> 在代码示例中以container表示容器的类名。容器内的元素简称为“项目”，在代码示例中以item表示项目的类名。 
+
+在不固定高度信息的情况下，只需要在容器中设置以下两个属性即可实现内容不确定下的垂直居中。
+
+flex不是一个属性，而是包含了一套新的属性集。属性集包括用于设置容器，和用于设置项目两部分。
+
+设置容器的属性有：
+
+```css
+display:flex;
+
+flex-direction:row（默认值） | row-reverse | column |column-reverse
+
+flex-wrap:nowrap（默认值） | wrap | wrap-reverse
+
+justify-content:flex-start（默认值） | flex-end | center |space-between | space-around | space-evenly
+
+align-items:stretch（默认值） | center  | flex-end | baseline | flex-start
+
+align-content:stretch（默认值） | flex-start | center |flex-end | space-between | space-around | space-evenly
+```
+
+设置项目的属性有:
+
+```css
+order:0（默认值） | <integer>
+
+flex-shrink:1（默认值） | <number>
+
+flex-grow:0（默认值） | <number>
+
+flex-basis:auto（默认值） | <length>
+
+flex:none | auto | @flex-grow @flex-shrink @flex-basis
+
+align-self:auto（默认值） | flex-start | flex-end |center | baseline| stretch
+```
+
+坐标轴：默认的情况下，水平方向的是主轴（main axis），垂直方向的是交叉轴（cross axis）。项目是在主轴上排列，排满后在交叉轴方向换行。需要注意的是，交叉轴垂直于主轴，它的方向取决于主轴方向。
+
+![axis](/images/tech/flex_axis.png)
+
+# 底层框架
+
+## 双线程模型
+
+微信选择 **Hydrid技术** 来进行渲染。即界面主要由成熟的 Web 技术渲染，辅之以大量的接口提供丰富的客户端原生能力。同时，每个小程序页面都是用不同的WebView去渲染，这样可以提供更好的交互体验，更贴近原生体验，也避免了单个WebView的任务过于繁重。此外，界面渲染这一块我们定义了一套内置组件以统一体验，并且提供一些基础和通用的能力，进一步降低开发者的学习门槛。值得一提的是，内置组件有一部分较复杂组件是用客户端原生渲染的，以提供更好的性能。
+
+web技术存在一些不可控因素和安全风险，例如JS脚本随意跳转网页或改变页面上的任务一内容，一些敏感内容（只能展示，开发者不能直接拿到数据）通过JS直接获取。因此为了解决管控与安全问题，我们必须阻止开发者使用一些浏览器提供的，诸如跳转页面、操作DOM、动态执行脚本的开放性接口，同时显然逐个禁止是不可能的（JS灵活，浏览器接口丰富，需要紧随浏览器内核更新），因此小程序采取的方式是提供一个沙箱环境来运行开发者的JavaScript 代码。这个沙箱环境不能有任何浏览器相关接口，只提供纯JavaScript 的解释执行环境，那么像HTML5中的ServiceWorker、WebWorker特性就符合这样的条件。
+
+得益于客户端系统有JavaScript 的解释引擎（在iOS下是用内置的 JavaScriptCore框架，在安卓则是用腾讯x5内核提供的JsCore环境），我们可以创建一个单独的线程去执行 JavaScript，在这个环境下执行的都是有关小程序业务逻辑的代码，也就是我们前面一直提到的逻辑层。而界面渲染相关的任务全都在WebView线程里执行，通过逻辑层代码去控制渲染哪些界面，那么这一层当然就是所谓的渲染层。这就是小程序双线程模型的由来。
+
+小程序的双线程模型决定了**任何数据传递都是线程间的通信**。
+
+## Skyline渲染引擎
+
+小程序一直以来采用的都是 AppService 和 WebView 的双线程模型，但由于其繁重的历史包袱和复杂的渲染流程，使得 Web 在移动端的表现与原生应用仍有一定差距。为了进一步优化小程序性能，提供更为接近原生的用户体验，我们在 WebView 渲染之外新增了一个渲染引擎 **Skyline**，其使用更精简高效的渲染管线，并带来诸多增强特性，让 Skyline 拥有更接近原生渲染的性能体验。
+
+原生的WebView上执行过多的 JS 逻辑可能阻塞渲染，导致界面卡顿。在 Skyline 环境下，我们尝试改变这一情况：Skyline 创建了一条渲染线程来负责 Layout, Composite 和 Paint 等渲染任务，并在 AppService 中划出一个独立的上下文，来运行之前 WebView 承担的 JS 逻辑、DOM 树创建等逻辑。这种新的架构相比原有的 WebView 架构，有以下特点：
+
++ 界面更不容易被逻辑阻塞，进一步减少卡顿
++ 无需为每个页面新建一个 JS 引擎实例（WebView），减少了内存、时间开销
++ 框架可以在页面之间共享更多的资源，进一步减少运行时内存、时间开销
++ 框架的代码之间无需再通过 JSBridge 进行数据交换，减少了大量通信时间开销
+
+
+![skyline](/images/tech/wechat_skyline.png)
+
+### 特性
+
+skyline只保留更现代的 CSS 集合，精简了大量CSS特性。同时添加了大量特性，使开发者能够构建出类原生体验的小程序。
+
+支持与webview混合使用
+
+```json
+// page.json
+// skyline 渲染
+{
+    "renderer": "skyline"
+}
+// webview 渲染
+{
+    "renderer": "webview"
+}
+
+// app.json
+{
+  "subPackages": [
+    {
+      "root": "packageA",
+      "pages": ["pages/cat"],
+      "componentFramework": "glass-easel",
+      "renderer": "skyline",
+    },
+  ],
+}
+```
+
+
+
+
+## 小程序和客户端的通信原理
+
+# 组件系统
+
+## exparser vs. glass-easel
+
+Exparser是微信小程序当前的组件组织框架，新版本组件框架[glass-easel](https://github.com/wechat-miniprogram/glass-easel)。glass-easel 可以让同样的组件代码运行在 web 、小程序等不同环境下，也就是支持不同的**后端**。在 web 环境下运行时，后端是浏览器的 DOM 接口；在小程序环境下运行时，后端则是小程序环境接口。
+
+glass-easel 完整具备小程序自定义组件相关特性，如组件模板、通信与事件、生命周期等等。此外， glass-easel 还实现了一些实用的新特性，也具有更好的 TypeScript 支持。
+
+
+## exparser框架
+
+Exparser的组件模型与WebComponents标准中的ShadowDOM高度相似。Exparser会维护整个页面的节点树相关信息，包括节点的属性、事件绑定等，相当于一个**简化版的Shadow DOM**实现。
+
+在使用自定义组件的小程序页面中，Exparser将接管所有的自定义组件注册与实例化。从外部接口上看，小程序基础库提供有Page和Component两个构造器。以Component为例，在小程序启动时，构造器会将开发者设置的properties、data、methods等定义段，写入Exparser的组件注册表中。这个组件在被其它组件引用时，就可以根据这些注册信息来创建自定义组件的实例。Page构造器的大体运行流程与之相仿，只是参数形式不一样。这样每个页面就有一个与之对应的组件，称为“页面根组件”。
+
+在初始化页面时，Exparser会创建出页面根组件的一个实例，用到的其他组件也会响应创建组件实例（这是一个递归的过程）。组件创建的过程大致有以下几个要点：
+
+1. 根据组件注册信息，从组件原型上创建出组件节点的JS对象，即组件的`this`；
+2. 将组件注册信息中的data 复制一份，作为组件数据，即`this.data`；
+3. 将这份数据结合组件WXML，据此创建出Shadow Tree，由于Shadow Tree中可能引用有其他组件，因而这会递归触发其他组件创建过程；
+4. 将ShadowTree拼接到Composed Tree上，并生成一些缓存数据用于优化组件更新性能；
+5. 触发组件的`created`生命周期函数；
+6. 如果不是页面根组件，需要根据组件节点上的属性定义，来设置组件的属性值；
+7. 当组件实例被展示在页面上时，触发组件的`attached`生命周期函数，如果Shadw Tree中有其他组件，也逐个触发它们的生命周期函数。
+
+### 组件间通信
+
+不同组件实例间的通信有WXML属性值传递、事件系统、selectComponent和relations等方式。其中，WXML属性值传递是从父组件向子组件的基本通信方式，而事件系统是从子组件向父组件的基本通信方式。
+
+Exparser的事件系统完全模仿Shadow DOM的事件系统。在通常的理解中，事件可以分为冒泡事件和非冒泡事件，但在ShadowDOM体系中，冒泡事件还可以划分为在Shadow Tree上冒泡的事件和在Composed Tree上冒泡的事件。如果在Shadow Tree上冒泡，则冒泡只会经过这个组件Shadow Tree上的节点，这样可以有效控制事件冒泡经过的范围。
+
+### 原生组件
+
+内置组件中有一些组件较为特殊，它们并不完全在Exparser的渲染体系下，而是由客户端原生参与组件的渲染，这类组件我们称为“原生组件”。例如地图组件：
+
+```xml
+<map latitude="39.92" longtitude="116.46"></map>
+```
+
+原生组件的渲染：在原生组件内部，其节点树非常简单，基本上可以认为只有一个div元素。在渲染层开始运行时，通常会经历以下几个步聚：
+
+1. 组件被创建，包括组件属性会依次赋值。
+2. 组件被插入到DOM树里，浏览器内核会立即计算布局，此时我们可以读取出组件相对页面的位置（x, y坐标）、宽高。
+3. 组件通知客户端，客户端在相同的位置上，根据宽高插入一块原生区域，之后客户端就在这块区域渲染界面
+4. 当位置或宽高发生变化时，组件会通知客户端做相应的调整
+
+> 原生组件在WebView这一层的渲染任务是很简单，只需要渲染一个占位元素，之后客户端在这块占位元素之上叠了一层原生界面。因此，**原生组件的层级会比所有在WebView层渲染的普通组件要高**。
+
+原生组件的好处：
+
+引入原生组件主要有3个好处：
+
+1. 扩展Web的能力。比如像输入框组件（input, textarea）有更好地控制键盘的能力。
+2. 体验更好，同时也减轻WebView的渲染工作。比如像地图组件（map）这类较复杂的组件，其渲染工作不占用WebView线程，而交给更高效的客户端原生处理。
+3. 绕过setData、数据通信和重渲染流程，使渲染性能更好。比如像画布组件（canvas）可直接用一套丰富的绘图接口进行绘制。
+
+
+| 组件名  | 名称           | 是否有 **context** | 描述                               |
+|---------|----------------|--------------------|------------------------------------|
+| video   | 视频           | 是                 | 播放视频                           |
+| map     | 地图           | 是                 | 展示地图                           |
+| canvas  | 画布           | 是                 | 提供一个可以自由绘图的区域         |
+| picker  | 弹出式选择器    | 否                 | 初始时没有界面，点击时弹出选择器   |
+
+> 交互比较复杂的原生组件都会提供“context”，用于直接操作组件, 例如：以canvas为例，小程序提供了`wx.createCanvasContext`方法来创建canvas的context。
+
+**原生组件的渲染限制**：
+
+原生组件脱离在WebView渲染流程外，这带来了一些限制。最主要的限制是一些CSS样式无法应用于原生组件，例如，不能在父级节点使用overflow:hidden来裁剪原生组件的显示区域；不能使用transformrotate让原生组件产生旋转等。
+
+开发者最为常见的问题是，原生组件会浮于页面其他组件之上（相当于拥有正无穷大的z-index值）使其它组件不能覆盖在原生组件上展示。想要解决这个问题，可以考虑使用`cover-view`和`cover-image`组件。这两个组件也是原生组件，同样是脱离WebView的渲染流程外，而原生组件之间的层级就可以按照一定的规则控制。
+
+# WeUI组件库
+
+微信官方提供的组件库，一套基于样式库weui-wxss开发的小程序扩展组件库，同微信原生视觉体验一致的UI组件库。
