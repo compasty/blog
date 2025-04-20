@@ -57,7 +57,7 @@ WorldQuant旨在开发具有低波动性和低风险的股票多空市场中性�
 1. PnL: Profit and Loss, 损益，在brain平台一般表示累计盈亏
 2. IS: Inside Sample, 在brain平台表示样本内期间
 3. OS: Outside Sample, 在brain平台表示样本外期间
-4. Sharpe Ratio: 该比率衡量Alpha策略的超额回报（或风险溢价）与其波动性之间的比率。它将PnL的平均值除以PnL的标准差, 公式为:$Sharpe Ratio=$。Sharpe Ratio或信息比率（IR）越高，Alpha策略潜在的回报越稳定，而稳定性是一个理想的特征。BRAIN平台的Sharpe Ratio通过要求为大于1.25来判断是否通过.
+4. Sharpe Ratio: 该比率衡量Alpha策略的超额回报（或风险溢价）与其波动性之间的比率。它将PnL的平均值除以PnL的标准差, 公式为:$Sharpe Ratio=\sqrt{252}\frac{Mean(PnL)}{Stdev(PnL)}$。Sharpe Ratio或信息比率（IR）越高，Alpha策略潜在的回报越稳定，而稳定性是一个理想的特征。BRAIN平台的Sharpe Ratio通过要求为**大于1.25**来判断是否通过.
 5. IC: Information Coefficient是衡量量化因子预测能力的一种指标。通常使用 Spearman 秩相关系数或 Pearson 相关系数来计算。一个较高的 IC 表示因子对未来收益有较好的预测能力。
     - Spearman 秩相关系数：用于衡量因子值与实际收益之间的秩相关性，适用于非线性关系。
     - Pearson 相关系数：用于衡量因子值与实际收益之间的线性相关性，适用于线性关系。
