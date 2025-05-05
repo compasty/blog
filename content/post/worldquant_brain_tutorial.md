@@ -32,6 +32,7 @@ mathjax: true
 ![brain_alpha](/images/quantitive/brain_works.png)
 
 具体来讲:
+
 1. **alpha求值**: 根据表达式生成给定日期的alpha向量，对应上面的D列
 2. **中性化**：从向量中的每个值中减去该组向量值的平均值。使得所有向量值的总和=0，对应上面的F列。
 3. **权重标准化**：将生成的值缩放或"标准化"，使得alpha向量值的绝对值总和为1。通常做法：原始值除以绝对值加和, 对应上面的H列。
@@ -79,8 +80,6 @@ print("Pearson IC:", pearson_ic)
 # Fast Expression语法
 
 ## 基础
-
-
 
 ## 运算符Operators
 
@@ -175,17 +174,10 @@ print("Pearson IC:", pearson_ic)
 | **转换运算**  | 分桶                | `bucket(rank(x), range="0,1,0.1")` | 将浮点值转换为自定义区间的索引（用于分组）                                               |
 |               | 条件交易            | `trade_when(x, y, z)`              | 仅在满足条件时更新 Alpha 值（如 `y` 触发时使用 `z` 逻辑）                                |
 
-
-
 # 结果评估
 
 ## 结果报告
 
 在BRAIN平台中，执行完模拟后会输出累计PnL图表，IS（样本内测试）概要。
 
-
-
-
 IS（样本内测试）回测使用5年时间范围内的数据，测试您的Alpha策略在历史时期的表现如何。模拟后，您将看到IS概要行，其中包括6个指标：Sharpe、Turnover、Fitness、Returns、Drawdown和Margin。
-
-
