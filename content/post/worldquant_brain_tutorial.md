@@ -32,6 +32,7 @@ mathjax: true
 ![brain_alpha](/images/quantitive/brain_works.png)
 
 具体来讲:
+
 1. **alpha求值**: 根据表达式生成给定日期的alpha向量，对应上面的D列
 2. **中性化**：从向量中的每个值中减去该组向量值的平均值。使得所有向量值的总和=0，对应上面的F列。
 3. **权重标准化**：将生成的值缩放或"标准化"，使得alpha向量值的绝对值总和为1。通常做法：原始值除以绝对值加和, 对应上面的H列。
@@ -68,7 +69,7 @@ $$
 
 3. Neutralize: 中心化。中性化是用于使我们的策略市场/行业/子行业中性的操作。当中性化 =“市场”时，它执行以下操作: $Alpha = Alpha – mean(Alpha)$, 其中alpha是权重向量. 操作后，它使 Alpha 向量的平均值为零。因此，与市场相比没有净头寸。换句话说，多头暴露完全抵消了空头暴露，使我们的策略市场中性。当中性化 = industry或subindustry时，Alpha 向量中的所有股票都分组到对应的行业或子行业中，并分别应用中性化。
 
-> 1. 在设置中配置Neutralize和在脚本中使用group_neutralize效果类似，脚本中使用group_neutralize时建议设置Neutralize为None, decay和truncation设置为0，例如: 
+> 1. 在设置中配置Neutralize和在脚本中使用group_neutralize效果类似，脚本中使用group_neutralize时建议设置Neutralize为None, decay和truncation设置为0，例如:
 
 4. Truncation: 截断，表示整体组合中每只股票的最大权重。当它设置为 0 时，表示没有限制。允许输入的截断值：0 <= x <= 1 的浮点数。截断旨在防止过度暴露于个别股票的波动。推荐的设置值为 0.05 到 0.1（涵盖 5%-10%）。
 5. Pasteurize: 巴氏化，是指**过滤掉不属于当前股票池的工具数据**，让数据更聚焦。On表示仅考虑当前股票池内的数据，将为未在回测设置中选择的股票池中的工具将输入转换为 NaN。可以使用`pasteurize`进行手动巴氏化，例如使用以下设置：Universe TOP500，Pasteurize：“Off”, 则`group_rank(pasteurize(sales_growth),sector) - group_rank(sales_growth,sector)`表示第一组排名中的消毒运算符将输入消毒为 Alpha 股票池（TOP500）中的股票，而第二组等级排名将 sales_growth 在所有股票中进行排名，两者做差。
@@ -112,8 +113,8 @@ print("Pearson IC:", pearson_ic)
 | Excellent         | > 2                | > 2.6              |
 | Average           | > 1                | > 1.3              |
 
-
 常见的一些指标的说明：
+
 1. 年化收益：特定期间内一种证券或组合的收益或损失。在BRAIN平台中，收益率=年化PnL/账户本金大小的一半.
 2. 信息比率IR, 夏普比率：参考上方
 3. 适应性Fitness: 是收益、换手率和Sharpe的函数: $Fitness=Sharpe\cdot \sqrt\frac{abs(Returns)}{max(Turnover, 0.125)}$ 。良好的Alpha具有高适应度。您可以通过增加Sharpe（或收益）并降低换手率来优化Alpha的表现。
@@ -144,7 +145,6 @@ print("Pearson IC:", pearson_ic)
 | **平方根**       | `sqrt(x)`                           | 返回 x 的平方根                                                                          | -                            |
 | **减法**         | `subtract(x, y, filter=false)` 或 `x - y` | 返回 x 减 y                                                                               | `filter=true` 将 NaN 替换为 0 |
 | **稀疏化**       | `densify(x)`                        | 将分组字段的多个桶合并为更少的可用桶以提高计算效率                                        | -                            |
-
 
 ### 逻辑运算符
 
@@ -188,7 +188,6 @@ print("Pearson IC:", pearson_ic)
 | **缩放**          | `scale(x, scale=1)`                | 将输入缩放到指定规模，可分别设置多头和空头比例（`longscale`, `shortscale`）             | -                            |
 | **截尾处理**      | `winsorize(x, std=4)`              | 将 x 限制在均值的 ±`std` 倍标准差范围内                                                 | -                            |
 | **横截面 Z 分数** | `zscore(x)`                        | 计算横截面 Z 分数：(x - 均值) / 标准差                                                  | -                            |
-
 
 ### 分组运算符
 
@@ -237,8 +236,8 @@ print("Pearson IC:", pearson_ic)
 ## 数据基础
 
 数据集是数据字段的集合。数据集可以通过其名称（文本格式，较长且具有解释性）或其数据集 ID（简短的字母数字格式，仅适用于高级脚本）来识别。
-+ matrix类型字段：基本类型的字段，每个日期和工具只有一个值，在模拟中使用这种字段没有特殊语法。矩阵字段的一些示例包括：收盘价、收益、市值。
-+ vector类型字段：表示某个时间一个资产有多个值的字段类型，例如每天一个股票可能有多个新闻/事件，矢量数据字段必须先使用**矢量运算符**转换为矩阵数据字段，然后才能与其他运算符和矩阵数据字段一起使用。否则，将返回错误消息。
+- matrix类型字段：基本类型的字段，每个日期和工具只有一个值，在模拟中使用这种字段没有特殊语法。矩阵字段的一些示例包括：收盘价、收益、市值。
+- vector类型字段：表示某个时间一个资产有多个值的字段类型，例如每天一个股票可能有多个新闻/事件，矢量数据字段必须先使用**矢量运算符**转换为矩阵数据字段，然后才能与其他运算符和矩阵数据字段一起使用。否则，将返回错误消息。
 
 ## 如何理解数据集
 
@@ -255,7 +254,6 @@ print("Pearson IC:", pearson_ic)
 | 5      | `ts_median(datafield, 1000) > X`                | 数据字段 5 年内的中位数 。改变 X 的值并查看长计数。类似的过程可用于检查数据字段的平均值。  |
 | 6      | `X < scale_down(datafield) && scale_down(datafield) < Y` | 数据字段的分布 。scale_down 充当 MinMaxScaler 函数，可以保留数据的原始分布。X 和 Y 的值在 0 到 1 之间变化，可以用来检查数据字段在其范围内的分布情况。    |
 
-
 ## 数据处理技巧
 
 1. 覆盖率是指给定数据字段具有定义值的所有品种占现有品种总数的比例。低覆盖率字段可以通过使用回填运算符（（例如 ts_backfill、kth element、group_backfill 等）来处理。
@@ -268,13 +266,11 @@ sentiment1 数据集将情绪指标与美国上市公司的盈利预测和意外
 
 这个数据集在TOP3000上覆盖了大约2000条，更建议使用流动性更强的TOP1000和TOPSP500.
 
-
 # 结果评估
 
 ## 结果报告
 
 在BRAIN平台中，执行完模拟后会输出累计PnL图表，IS（样本内测试）概要。
-
 
 IS（样本内测试）回测使用5年时间范围内的数据，测试您的Alpha策略在历史时期的表现如何。模拟后，您将看到IS概要行，其中包括6个指标：Sharpe、Turnover、Fitness、Returns、Drawdown和Margin。
 
@@ -332,10 +328,9 @@ turnover降低：
 | Earnings Datasets |  |  | ✔️ |  | 对于盈利数据集，建议进行行业中性化处理，类似于基本面数据集。 |
 | Macro Datasets | ✔️ | ✔️ | ✔️ |  | 行业板块/市场/行业是宏观经济活动，对这些类别进行中性化处理效果最佳。子行业间差异不大。 |
 
-
 ## 权重测试Weight Test失败
 
-权重测试只是衡量 Alpha 基金单只股票的资本集中度。在 BRAIN 中，该限制为总账簿规模的 10%。权重测试对于限制股价波动造成的回撤风险至关重要，尤其是在样本外。所以一个简单的方式就是设置一个较低的Truncation截断值. 
+权重测试只是衡量 Alpha 基金单只股票的资本集中度。在 BRAIN 中，该限制为总账簿规模的 10%。权重测试对于限制股价波动造成的回撤风险至关重要，尤其是在样本外。所以一个简单的方式就是设置一个较低的Truncation截断值.
 
 导致权重测试失败的主要因素之一是覆盖率。例如，如果在模拟过程中的任何时候，多头或空头仓位的股票数量少于 10 只，或者股票总数少于 20 只。通常，覆盖率低和/或多空仓位不平衡的 Alpha 会失败。处理的方式：（1）使用类似`ts_backfill`等函数进行缺失数据的补齐，具体的参数值需要根据参数的情况来设定，例如季度更新的数据可以使用30,60的参数 （2）使用`is_nan()`,`last_diff_value*()`，`day_from_last_change()`来进行回填
 
@@ -347,10 +342,7 @@ turnover降低：
 
 [解决办法](https://support.worldquantbrain.com/hc/en-us/articles/6568644868375-How-do-I-resolve-this-error-Sub-universe-Sharpe-NaN-is-not-above-cutoff?_gl=1%2A1o1du0y%2A_gcl_au%2AOTE1Njc1OC4xNzQyMjc1NjE2%2A_ga%2AMTczNjkyNDcyOTEyN2MxYmI0OTAwNjhlNTM.%2A_ga_9RN6WVT1K1%2AMTc0NTU4NjI2MS41MC4xLjE3NDU1ODk5ODEuNjAuMC4w)
 
-
 # 常用缩写
 
 1. eps: Earnings per share 每股收益
 2. IV: Implied volatility 隐含波动率
-
-
