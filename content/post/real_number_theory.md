@@ -8,7 +8,6 @@ keywords:
   - real analysis
 tags:
   - real analysis
-description: '实数基础定理'
 mathjax: true
 ---
 
