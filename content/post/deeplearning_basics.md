@@ -13,7 +13,7 @@ description: "深度学习入门"
 
 # 概述
 
-本文为深度学习的入门实践记录，对应源代码放在[工程](https://github.com/compasty)
+本文为深度学习的入门实践记录，对应源代码放在[工程](https://github.com/compasty/dl-tutorial)
 
 # 基础
 

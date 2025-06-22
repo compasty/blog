@@ -34,6 +34,9 @@ params:
   VisitCount: true
   ShowToc: true # 显示目录
   TocOpen: true # 自动展开目录
+  ShowCodeCopyButtons: true # 显示复制代码按钮
+  ShowBreadCrumbs: true # 显示面包屑
+  ShowWordCount: true # 显示字数
 
   socialIcons:
     - name: github
