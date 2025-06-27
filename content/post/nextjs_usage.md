@@ -24,9 +24,12 @@ tags:
 
 > 使用`pnpm`可以使用命令: `pnpm dlx create-next-app@latest`
 
-
-
 ### 1.2 页面(Pages)和路由(Router)
 
 Next.js包含两种路由器:
-- App Router: 
+
+- App Router:
+
+## 2. 组件&样式
+
+### 2.1 tailwind

@@ -8,4 +8,8 @@ keywords:
   - fourier transform
 tags:
   - fourier transform
+mathjax: true
 ---
+
+
+
