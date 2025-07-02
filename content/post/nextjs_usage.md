@@ -22,12 +22,11 @@ tags:
 
 创建Next.js应用最简单的方法就是使用`create-next-app`（要求nodejs 18.18+）: `npx create-next-app@latest`。
 
-> 使用`pnpm`可以使用命令: `pnpm dlx create-next-app@latest`
+使用`pnpm`可以使用命令: `pnpm dlx create-next-app@latest`，或者创建一个使用Tailwind V4和React 19的项目：`pnpm create next-app@canary --tailwind --eslint --typescript --app --no-src-dir`
 
 ### 1.2 路由模式(Router)
 
 Next.js包含两种路由模式，`App Router`和`Page Router`，对应不同的目录结构和特性。
-
 
 | 特性           | Page Router                      | App Router                      |
 |----------------|--------------------------------|--------------------------------|
@@ -114,27 +113,24 @@ export default function Page() {
 
 |file name|description|
 |---------|-----------|
-|app | App Router | 
-|public	| Static assets to be served|
-|next.config.js	| Configuration file for Next.js |
-|package.json	| Project dependencies and scripts |
-|instrumentation.ts	| OpenTelemetry and Instrumentation file|
+|app | App Router |
+|public | Static assets to be served|
+|next.config.js | Configuration file for Next.js |
+|package.json | Project dependencies and scripts |
+|instrumentation.ts | OpenTelemetry and Instrumentation file|
 |middleware.ts | Next.js request middleware|
-|.env	| Environment variables|
-|.env.local	| Local environment variables|
-|.env.production	| Production environment variables|
-|.env.development	| Development environment variables|
+|.env | Environment variables|
+|.env.local | Local environment variables|
+|.env.production | Production environment variables|
+|.env.development | Development environment variables|
 |.eslintrc.json | Configuration file for ESLint|
-|.gitignore	| Git files and folders to ignore|
-|next-env.d.ts	| TypeScript declaration file for Next.js|
-|tsconfig.json	| Configuration file for TypeScript|
-
-
-
+|.gitignore | Git files and folders to ignore|
+|next-env.d.ts | TypeScript declaration file for Next.js|
+|tsconfig.json | Configuration file for TypeScript|
 
 ## 2. 组件
 
-### 服务端和客户端组件
+### 2.1 服务端和客户端组件
 
 默认情况，layouts和pages是`Server Components`, 允许在服务器上获取数据并渲染部分UI, 并且可以选择缓存结果然后将其流式传输到客户端。当您需要交互功能或浏览器 API 时，可以使用`Client Components`客户端组件。
 
@@ -185,10 +181,51 @@ export default function LikeButton({ likes }: { likes: number }) {
 }
 ```
 
+从上面的示例中，`"use clint"`这个指令表示创建客户端组件，一旦文件被文件标记为 “use client” ， **其所有导入和子组件都被视为 client bundle 的一部分**，不需要将指令添加到用于 Client 端的每个组件中。
+
+如果希望减少客户端Javascript包的大小，尽量仅在必要的组件上使用`"use client"`指令，而不是将UI的大部分标记为客户端组件。例如：下面的`<Layout>`组件主要包含静态元素，仅其中的搜索栏`<Search>`是交互式的，因此将搜索栏声明为Client Components，而其余保持为Server Components
+
+```typescript
+// Client Component
+import Search from './search'
+// Server Component
+import Logo from './logo'
+ 
+// Layout is a Server Component by default
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <nav>
+        <Logo />
+        <Search />
+      </nav>
+      <main>{children}</main>
+    </>
+  )
+}
+```
+
+### 2.2 工作原理
+
+#### 2.2.1 服务器端
+
+`Next.js`使用React的API来编排渲染，渲染工作按照各个路由段（layouts and pages）拆分为块：其中: Server Components被渲染成一种特殊的数据格式，称为React Server Component Payload（RSC Payload），Client Components和RSC Payload用于**预渲染**HTML.
+
+> RSC Payload: RSC Payload是用于渲染完成的React服务器组件树的紧凑二进制表示（compact binary representation）, React可以在客户端使用这个数据来更新浏览器DOM.RSC Payload包含：Server Components的渲染结果、客户端组件应呈现位置的占位符以及其对Javascript文件的引用，从Server Component传递到Client Component的任何props
+
+#### 2.2.2 客户端
+
+在客户端上，**HTML**用于立即向用户展示路由的快速非交互式预览，**RSC Payload**用于协调 Client 和Server Component树， **JavaScript**用于激活客户端组件并使应用程序具有交互性。
+
+> hydration(补水)：表示React 将事件处理程序附加到 DOM 的过程，以使静态 HTML 具有交互性
+
+### 2.3 数据传递
+
+可以使用`props`将数据从Server Components传递到Client Components（如2.1中的`<LikeButton>`组件）, 也可以使用`use` Hook进行流式的传值。
+
 ## 3. 样式
 
 ### 3.1 tailwind
-
 
 ## 4. Auth.js
 
@@ -242,3 +279,74 @@ export { auth as middleware } from "@/auth"
 > Auth.js推荐使用OAuth服务
 
 Auth.js 默认使用加密的 JSON Web Token(JWT) 将会话保存在 Cookie 中，因此您无需设置数据库。如果希望持久保存用户数据，可以使用我们的官方数据库适配器之一设置数据库，或者创建您自己的数据库。
+
+OAuth服务配置
+
+Github: 申请地址 [github developer settings](https://github.com/settings/developers), 回调地址参考下方进行配置。
+
+默认的回调地址URL应该是类似：`[origin]/api/auth/callback/[provider]`的格式，例如：
+
+```javascript
+// Local
+http://localhost:3000/api/auth/callback/github
+ 
+// Prod
+https://app.company.com/api/auth/callback/github
+```
+
+## 5. Shadcn
+
+ShadCN/UI 是一组设计精美、可访问的组件和一个代码分发平台，完全开源。
+
+安装方式：`pnpm dlx shadcn@canary init`
+添加组件：`pnpm dlx shadcn@canary add button`
+
+> Shadcn默认使用Tailwind V3, 如果要使用Tailwind V4的话，需要使用`shadcn@canary`, 否则使用`shadcn@latest`
+
+添加组件以后可以类似如下进行使用：
+
+```typescript
+import { Button } from "@/components/ui/button"
+
+export default function Home() {
+  return (
+    <div>
+      <Button>Click me</Button>
+    </div>
+  )
+}
+```
+
+上面的初始化代码中会创建一个`components.json`文件，其中包含项目的配置。其内容类似如下：
+
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "tailwind.config.ts",
+    "css": "src/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": "tw-"
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "iconLibrary": "lucide"
+}
+```
+
+其中:
+
+1. `schema`: 表示文件对应的json schema
+2. `style`: 表示组件的样式，**初始化以后无法更改**
+3. `tailwind`: 表示如何在项目中设置Tailand CSS, 其中`config`表示对应的 `tailwind.config.ts`文件所在的路径，**对于Tailwind CSS v4, 该字段应该留空**，`css`表示将Tailwind CSS导入到项目中的文件路径, `baseColor`用于为组件生成默认调色板，**初始化后无法更改**；`cssVariables`表示用CSS变量还是Tailwind CSS utility classes进行主题设置，设置为false表示使用Tailwind CSS utility classes，设置为true表示使用css变量，**初始化后无法更改**；`prefix`用于Tailwind CSS utility classes的前缀。
+4. `rsc`表示是否启用对React Server Components的支持，当设置为true时，CLI会自动将`use client`指令添加到客户端组件。
+5. `aliases`: shadcn使用这里的配置以及`tsconfig.json`文件中的`paths`配置，来保证生成的组件放置在正确的位置
