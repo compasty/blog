@@ -242,3 +242,67 @@ export { auth as middleware } from "@/auth"
 > Auth.js推荐使用OAuth服务
 
 Auth.js 默认使用加密的 JSON Web Token(JWT) 将会话保存在 Cookie 中，因此您无需设置数据库。如果希望持久保存用户数据，可以使用我们的官方数据库适配器之一设置数据库，或者创建您自己的数据库。
+
+## 5. 数据交互
+
+### 5.1 获取数据Fetching data
+
+Server Components中获取数据常用的方式：
+
+1. `fetch` API
+
+如果需要使用`fetch`获取，需要将组件转换为异步函数，并等待`fetch`调用。
+
+```typescript
+// app/blog/page.tsx
+export default async function Page() {
+  const data = await fetch('https://api.vercel.app/blog')
+  const posts = await data.json()
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+> 默认情况下，`fetch`响应不会被缓存，但是`Next.js`会预渲染路由，并将输出缓存以提高性能；如果需要启动动态渲染（dynamic rendering）,需要使用`{cache: 'no-store'}`选项。
+
+
+2. ORM或者数据库
+
+由于Server Components在服务器上渲染，所以可以安全的使用ORM或者数据库, 将组件转换为异步函数并等待调用。
+
+```typescript
+// app/blog/page.tsx
+import { db, posts } from '@/lib/db'
+ 
+export default async function Page() {
+  const allPosts = await db.select().from(posts)
+  return (
+    <ul>
+      {allPosts.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+Client Components获取数据的方式:
+
+1. 使用`use` hook
+
+
+## 8. React知识拾遗
+
+### 8.1 `Suspense`
+
+
+
+
+
+
+

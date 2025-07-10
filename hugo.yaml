@@ -1,5 +1,5 @@
-baseURL: 'https://compasty.netlify.app/'
-languageCode: 'en-us'
+baseURL: "https://compasty.netlify.app/"
+languageCode: "en-us"
 paginatation:
   pagerSize: 5
 
@@ -13,14 +13,19 @@ buildFuture: false
 buildExpired: false
 
 markup:
-    highlight:
-        # anchorLineNos: true
-        codeFences: true
-        guessSyntax: true
-        lineNos: true
-        # noClasses: false
-        # style: monokai
-        style: dracula
+  highlight:
+    # anchorLineNos: true
+    codeFences: true
+    guessSyntax: true
+    lineNos: true
+    # noClasses: false
+    # style: monokai
+    style: dracula
+  goldmark:
+    renderer:
+      hardWraps: false
+      unsafe: true
+      xhtml: false
 
 minify:
   disableXML: true

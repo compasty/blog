@@ -14,102 +14,207 @@ tags:
  
 ## Lean4：定理证明与函数式编程的完美融合
 
-**Lean4是一款由微软研究院开发的先进定理证明器和通用函数式编程语言**，它结合了形式化数学证明的强大功能与现代编程语言的实用特性。作为交互式定理证明器(Interactive Theorem Prover, ITP)，Lean4允许数学家和研究者将数学定理转换为可验证的代码形式，确保证明的绝对正确性。同时，作为编程语言，它支持函数式编程范式、依赖类型系统和元编程能力，使开发者能够编写高效且类型安全的代码。Lean4以其强大的类型系统、丰富的数学库Mathlib4（已超过150万行代码）以及与Rust类似的工具链管理（elan、lake）而脱颖而出，正成为数学形式化和程序验证领域的主流工具。
+**Lean4是一款由微软研究院开发的定理证明器和通用函数式编程语言**，它结合了形式化数学证明的强大功能与现代编程语言的实用特性。作为交互式定理证明器(Interactive Theorem Prover, ITP)，Lean4允许数学家和研究者将数学定理转换为可验证的代码形式，确保证明的绝对正确性。同时，作为编程语言，它支持**函数式编程范式、依赖类型系统和元编程能力**，使开发者能够编写高效且类型安全的代码。Lean4以其强大的类型系统、丰富的数学库Mathlib4（已超过150万行代码）以及与Rust类似的工具链管理（elan、lake）而脱颖而出，正成为数学形式化和程序验证领域的主流工具。
 
-### 一、Lean4的安装与配置
 
-在2025年的最新版本中，Lean4的安装配置已变得更加便捷，尤其对于国内用户。以下是跨平台的安装指南：
+### Lean4工具链
 
-**1. Linux系统安装**
+Lean 4 的完整开发环境由以下核心组件构成：
 
-对于Ubuntu/Debian系统，可直接使用官方提供的安装脚本：
+1. [elan](https://github.com/leanprover/elan)：Lean 的版本管理工具，用于安装、管理和切换不同版本的 Lean，类似于 Rust 的 rustup 或 Node.js 的 nvm。
+2. lake（Lean Make）：Lean 的包管理器和构建器，已集成到 Lean 4 核心仓库中。用于创建 Lean 项目，构建 Lean 包,编译 Lean 可执行文件等。
+3. [lean](https://github.com/leanprover/lean4)：语言本身的核心组件，负责实际的代码编译和语言服务器协议（LSP）支持，用户不需要直接与 lean 交互。
+
+### Lean4的安装与配置
+
+最简单的方式，就是使用mathlib提供的对应系统的安装脚本，以Ubuntu/Debian系统为例:
+
 ```bash
 wget -q https://raw.githubusercontent.com/leanprover-community/mathlib4/master/scripts/install_debian.sh && bash install_debian.sh
 ```
 
-若网络受限，可借助上海交通大学镜像源加速下载：
+手动安装方式：在 [GitHub release页面](https://github.com/leanprover/elan/releases)或者 [上交镜像源](https://s3.jcloud.sjtu.edu.cn/899a892efef34b1b944a19981040f55b-oss01/elan/mirror_clone_list.html)，根据系统版本下载elan。解压后得到`elan-init`文件，赋予可执行权限并执行安装,最后设置PATH。
+
 ```bash
-curl https://s3.jcloud.sjtu.edu.cn/899a892efef34b1b944a19981040f55b-oss01/elan/elan-x86_64-unknown-linux-gnu.tar.gz -o elan.tar.gz
-tar xf elan.tar.gz
 chmod +x elan-init
 ./elan-init -y --default-toolchain none
+# 设置环境变量
+export PATH="$HOME/.elan/bin:$PATH"
+# 检查版本
+elan -V
+elan show
 ```
 
-安装完成后，配置环境变量：
+### Lean4工具链基本用法
+
+elan是Lean版本管理器，用于安装、管理和切换不同版本的 Lean。
+
 ```bash
-echo 'export PATH="$HOME/.elan/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
+elan --version   # 输出版本号来测试安装是否成功
+elan self update # 更新 elan
+elan show        # 显示已安装的 Lean 版本
+
+# 下载指定 Lean 版本，所有版本可见 https://github.com/leanprover/lean4/releases
+elan install leanprover/lean4:v4.10.0
+
+# 下载最新稳定版本 stable
+elan default leanprover/lean4:stable 
+
+# 切换默认的 Lean 版本
+# 切换到 leanprover/lean4:v4.11.0-rc1 
+elan default leanprover/lean4:v4.11.0-rc1 
+
+# 设置在当前目录下使用的 Lean 版本
+elan override set leanprover/lean4:stable
+# info: info: override toolchain for 'xxx' set to 'leanprover/lean4:stable'
 ```
 
-**2. Windows系统安装**
+> elan的配置记录可以在 `~/.elan/settings.toml`中查看， `.elan`文件夹中`toolchains`存放下载的各个Lean版本，`bin`存放常见的二进制文件，比如`lake`
 
-Windows用户可选择一键安装工具，确保C盘有至少5GB可用空间：
-```powershell
-# 下载并运行安装工具
-curl -O https://s3.jcloud.sjtu.edu.cn/899a892efef34b1b944a19981040f55b-oss01/ lean4 /windows /FIRC.exe
-# 运行安装程序
-.\FIRC.exe
-```
+lake 全称 Lean Make，是 Lean 4 的包管理器，用于创建 Lean 项目，构建 Lean 包和编译 Lean 可执行文件。
 
-或手动安装ELAN工具链管理器：
-```powershell
-# 下载ELAN初始化脚本
-curl -O --location https://raw.githubusercontent.com/ leanprover /elan/master/elan-init.ps1
-# 运行初始化脚本
-powershell -ExecutionPolicy Bypass -f elan-init.ps1
-# 删除临时文件
-del elan-init.ps1
-```
-
-**3. macOS系统安装**
-
-macOS用户可通过Homebrew或直接安装ELAN：
 ```bash
-# 安装Homebrew（如未安装）
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-# 安装Lean4
-brew install lean4
-# 或手动安装ELAN
-curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
+lake new your_project_name
+
+# 或者手动创建一个新文件夹并在原地建立项目
+mkdir your_folder_name && cd your_folder_name && lake init your_project_name
+
+# 构建项目可执行文件
+lake build
+# 运行
+lake exec hello # Hello, world!
+# 清理构建文件
+lake clean
+# 更新依赖
+lake update
+# 运行 lakefile.lean 的脚本
+lake run <script>
 ```
 
-**4. VS Code集成**
+项目目录结构如下，其中: `lakefile.lean` 是当前项目的配置文件，`lean-toolchain`是当前项目使用的 Lean 版本。
+```
+your_project_name
+├── YourProjectName
+│   └── Basic.lean
+├── lakefile.lean
+├── lean-toolchain
+├── Main.lean
+├── YourProjectName.lean
+└── ...
+```
 
-安装完成后，建议配置VS Code环境以获得最佳开发体验：
-1. 在VS Code中安装Lean4扩展（`leanprover.lean4`）
-2. 创建新项目：
+如果需要在工程中引用Mathlib4, 可以再`lakefile.lean`文件尾部加入。
+
+```lean
+require mathlib from git
+  "https://github.com/leanprover-community/mathlib4"
+```
+
+然后下载 Mathlib，注意让终端路径在你的项目文件夹下。然后在终端中运行：
+
 ```bash
- lake new MyProject
+curl -L https://raw.githubusercontent.com/leanprover-community/mathlib4/master/lean-toolchain -o lean-toolchain
+lake update
+# 保存运行缓存，对于优化编译十分重要，及其建议
+lake exe cache get
 ```
 
-3. 进入项目目录并构建：
+> 更新也可以使用上面的脚本
+
+如果希望更新Mathlib, 可以执行:
+
 ```bash
- cd MyProject
- lake build
+curl -L https://raw.githubusercontent.com/leanprover-community/mathlib4/master/lean-toolchain -o lean-toolchain
+lake update
+lake exe cache get
 ```
 
-4. 运行项目：
+lean 是语言本身的核心组件，通常不需要直接与 lean 交互。常见的两个操作：运行 Lean 脚本，以及验证 Lean 代码。
+
 ```bash
- lake exec MyProject
+# 执行lean脚本
+elan default leanprover/lean4:v4.11.0-rc1 lean --run hello.lean
+# 验证lean脚本
+lean proof.lean
 ```
 
-### 二、Lean4的基本使用方法
+## Lean4的基本使用方法
 
-Lean4作为一种函数式编程语言，其基本语法与Haskell、ML等语言有相似之处，但又具有自己的特色。以下是几个简单的使用示例：
+Lean4作为一种**函数式编程语言**，其基本语法与Haskell、ML等语言有相似之处，但又具有自己的特色。
 
-**1. 函数定义与调用**
+### 类型
 
-在Lean4中定义函数非常直观：
+类型是根据可计算的值的一种分类方式，类型在程序中扮演多种角色：
+1. 允许编译器基于类型决定值的内存表示
+2. 作为函数输入和输出的轻量级规范，编译器确保程序遵循此规范
+3. 防止潜在错误，如在字符串中添加数字
+
+Lean中每个表达式在被求值之前必须有一个类型，很多情况下Lean可以自行发现类型，但有时也需要提供一个类型注释，使用冒号运算法进行声明。例如：`#eval (1+2: Nat)`。这里`Nat`表示自然数类型, 即任意精度的无符号整数。在Lean中, `Nat`是非负整数字面值的默认类型，但是这种类型并不总是最好的选择。在 C 语言中，当减法得出的结果小于零时，无符号整数会下溢到可表示的最大数字。 然而，`Nat`可以表示任意大的无符号数，因此不存在下溢的最大数。因此，对 Nat 进行减法运算时，如果答案本来是负数，则会返回zero。例如：`#eval (1 - 2 : Nat)`的计算结果是0，而不是-1，此时应该使用`#eval (1-2: Int)`
+
+### 函数和定义
+
+在Lean中，使用`def`关键字声明定义，例如：`def hello := "Hello"`。这里Lean为自动判断其类型，也可以手动添加类型，例如：`def lean: String := "Lean"`
+
+> Lean 中，新名称使用 `:=` 而不是`=`来定义。这是因为`=`用于描述现有表达式之间的相等性，而使用两个不同的运算符有助于避免混淆.
+
+Lean中定义函数的方法有很多种，最简单的方式是将函数的参数放在定义类型之前并使用空格分隔。例如:`def addOne (x : Int) : Int := x + 1`。如果应用于多个参数，需要在参数名称和类型之间加空格。
+
 ```lean4
-def addOne (x : Int) : Int := x + 1
-def add (x y : Int) : Int := x + y
+def maximum (n : Nat) (k : Nat) : Nat :=
+  if n < k then
+    k
+  else n
 ```
 
-然后可以通过`#eval`命令测试函数：
-```lean4
-#eval addOne 2   -- 输出3
-#eval add 2 3    -- 输出5
+计算结果为自然数、整数和字符串的表达式分别对应类型`Nat`, `Int`和`String`.函数也是类型，接收`Nat`返回`Bool`的函数对应类型`Nat → Bool`，接收两个`Nat`返回`Nat`的函数对应类型为`Nat → Nat → Nat`.使用 `#check [func_name]`会返回函数的签名，例如输入`#check maximum`，会返回`Nat → Nat → Nat`。
+
+事实上，所有Lean的函数实际上只需要一个参数，类似像`maximum`这样接受多个参数的函数，实际上是接受一个参数然后返回一个新函数，这个新函数会接受下一个参数，并继续执行该过程直到不再需要其他参数为止。例如：`#check maximum 3`会返回`Nat → Nat`。
+
+> 使用返回函数的函数来实现多参数函数被称为 柯里化（currying），以数学家 Haskell Curry 命名。函数箭头右结合，这意味着 Nat → Nat → Nat 等价于 Nat → (Nat → Nat)
+
+类似C语言中的typedef, Lean中类型作为一等公民，类似表达式，定义可以引用类型，就像引用其他值一样：`def Str: Type := String`, 然后可以使用`Str`而不是`String`作为定义的类型：`def aStr: Str := "This is a string."`
+
+但是下面的示例会出现问题：
+
+```lean
+def NaturalNumber : Type := Nat
+def thirtyEight : NaturalNumber := 38
 ```
+
+这是因为Lean允许数字字面值重载，Lean允许在合理的情况下将数字字面值用于新类型，因为不同的数学分支使用数学符号的目的大相径庭。允许数字字面值重载这种特性使得在查找到重载之前不会替换为定义，进而导致错误。
+
+解决限制的方法是在定义的右侧提供类型`Nat`, 使得`Nat`的重载规则可以用于38. `def thirtyEight : NaturalNumber := (38 : Nat)`。另一种方法是为 NaturalNumber 定义一个重载，其功能与 Nat 相同（后续介绍），最后一种解决方案是使用 `abbrev`，而不是`def`来定义`Nat`的新名称，允许重载解析为新定义的名字。使用`abbrev`编写的定义始终会展开。
+
+```lean
+abbrev N : Type := Nat
+def thirtyNine : N := 39
+```
+
+> 在Lean底层，部分定义在重载解析过程中被内部标记为可展开，而另一些则不是。**需要展开的定义被称为可约简 (reducible)**。控制可约简性对于Lean的扩展至关重要：完全展开所有定义可能会导致类型非常庞大，机器处理速度慢，用户难以理解。使用`abbrev`生成的定义被标记为可约简。
+
+### 结构Structures
+
+类似C中的struct, 可以使用`structure`关键字定义新类型。
+
+```lean
+structure Point where
+  x : Float
+  y : Float
+deriving Repr
+```
+
+上面定义了一个包含两个Float字段的笛卡尔点，其中最后一行`deriving Repr`要求 Lean 生成代码来显示类型 Point 的值。此代码由 #eval 用来渲染求值结果以供程序员使用，类似于 Python 中的 repr 函数。
+
+创建结构体类型的值的典型方法是将其所有字段的值放在花括号内：`def origin : Point := { x := 0.0, y := 0.0 }`。
+
+
+### 关于书写
+
+1. → 可以使用ASCII字符 `->` 等效
+
+
+
+
 
 **2. 依赖类型与强类型系统**
 
