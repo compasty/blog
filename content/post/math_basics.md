@@ -15,11 +15,12 @@ mathjax: true
 
 ## 1. 三角函数
 
-基础定义:
+### 1.1 基础定义
+
 - $\tan \theta = \frac{\sin \theta}{\cos \theta}$
 - $\csc \theta = \frac{1}{\sin \theta}, \quad \sec \theta = \frac{1}{\cos \theta}, \quad \cot \theta = \frac{1}{\tan \theta} = \frac{\cos \theta}{\sin \theta}$
 
-基本恒等式:
+### 1.2 基本恒等式
 
 1. **毕达哥拉斯恒等式**: $\sin^2 \theta + \cos^2 \theta = 1$
 
