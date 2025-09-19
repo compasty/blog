@@ -42,6 +42,38 @@ export default {
 
 ## Workers详细使用
 
+### 环境变量
+
+环境变量可以在`fetch`函数的`env`变量中进行获取，环境变量使用`.wrangler.json`的`vars`字段，如果需要区分不同的环境使用不同的变量则可以使用`env`字段，在命令行使用的时候可以用`--env`或者`-e`标志来进行环境的指定，例如：`pnpm dlx wrangler dev -e staging`
+
+```json
+{
+  "name": "my-worker-dev",
+  "vars": {
+    "API_HOST": "example.com",
+    "API_ACCOUNT_ID": "example_user",
+    "SERVICE_X_DATA": {
+      "URL": "service-x-api.dev.example",
+      "MY_ID": 123
+    }
+  },
+  "env": {
+    "staging": {
+      "vars": {
+        "API_HOST": "staging.example.com"
+      }
+    },
+    "production": {
+      "vars": {
+        "API_HOST": "production.example.com"
+      }
+    }
+  }
+}
+```
+
+> 永远不要将敏感信息存储在环境变量中，而是使用secret进行管理
+
 ### secret
 
 secret是一种特殊的绑定类型，允许将加密文本值附加到workers。密钥在传递给worker的`fetch`方法中的`env`参数中可以被访问，可以通过支持Node.js兼容性的workers中`process.env`访问。
@@ -52,11 +84,12 @@ const sql = postgres(env.DB_CONNECTION_STRING);
 const result = await sql`SELECT * FROM products;`;
 ```
 
-> 1. 永远不要使用`vars`将敏感信息存储在wrangler配置文件中，仅可以将本地开发的密钥放在`.dev.vars`文件中或者`.env`文件中
-> 2. `.dev.vars` 和 `.env` 文件不应提交到 git。将 `.dev.vars*` 和 `.env*` 添加到项目的 `.gitignore` 文件中
-
 添加secret: `pnpm dlx wrangler secret put <KEY>`, 或者通过Cloudflare的配置页面进行添加
 删除secret: `pnpm dlx wrangler secret delete <KEY>`
+
+本地开发时一般将敏感信息存储在`.dev.vars`文件中或者`.env`文件中。
+
+> `.dev.vars` 和 `.env` 文件不应提交到 git。将 `.dev.vars*` 和 `.env*` 添加到项目的 `.gitignore` 文件中
 
 
 ## 配套产品
