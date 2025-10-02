@@ -12,21 +12,21 @@ tags:
   - MCP
   - Model Context Protocol
   - LLM
-description: ""
+mathjax: true
 ---
 
 # 基础
 
 MCP(Model Context Protocol): 是Anthropic于2024年11月推出的开放的模型上下文协议，标准化了应用向AI Agent提供上下文的方式，可以视作AI应用的USB-C接口，提供了一种将AI Agent连接到不同数据源和工具的标准化方式。
 
-![MCP Hub](/images/ai/mcp_hub2.jpeg)
+![MCP Hub](/images/ai/mcp-hub2.jpeg)
 
 
 核心价值:
 
 其核心价值在于：
 
-+ **协议化连接**：标准化AI模型与外部系统的交互方式，将传统 $M×N$的集成度复杂度降为$M+N$模式
++ **协议化连接**：标准化AI模型与外部系统的交互方式，将传统 $M×N$ 的集成度复杂度降为 $M+N$ 模式
 + **生态构建**：形成类似编程领域LSP（语言服务器协议）的开放生态，已有200+开源MCP服务器在GitHub涌现
 + **性能突破**：支持动态上下文管理，实测Token消耗降低40%，推理延迟控制在200ms内
 
@@ -221,16 +221,55 @@ if __name__ == "__main__":
 
 ## 工具Tools
 
-# Python SDK使用
+# 技术细节
 
-## 添加资源
+## 通信方式SSE/STDIO/Streamable HTTP
 
-## 添加prompts
+| 场景 | 推荐协议 | 一句话理由 |
+| --- | --- | --- |
+| 本地脚本、桌面 IDE | stdio | 零网络、毫秒级延迟，本地插件首选 |
+| 内网微服务、云函数 | Streamable HTTP | 双向流 + 断线续传，云时代的默认标准 |
+| 老版本兼容、单向推送 | SSE | 简单但已标注 deprecated，了解即可 |
 
+### Stdio
 
+工作原理：
 
+1. 把 MCP Server 作为 **子进程** 启动
+2. 通过 `stdin/stdout` 传递标准的 JSON-RPC 2.0 报文
+3. 用 `\n` 字符分隔每一次完整的消息
 
+使用场景:
 
+1. VS Code、Cursor、Cherry Studio 等本地 IDE 插件
+2. 离线环境、CI/CD 脚本、本地工具链
+
+优点：
+
+1. 极简（一条命令就能运行）、低延迟、零网络配置
+2. 仅限本机、无法远程调用；子进程崩溃需要手动重启或处理
+
+### Streamable HTTP
+
+> 自 2025-03-26 起，官方已将 **Streamable HTTP** 设为 **默认的远程传输协议**。它解决了早期 SSE 的局限，是构建强大云端 MCP 服务的基石。
+
+工作原理
+
+1. 客户端向服务器的 `/mcp` 端点发起 POST 请求，携带 JSON-RPC 消息
+2. 服务器接收请求后，立即返回 200 OK 或 202 Accepted 状态码
+3. 服务器在 **同一个 HTTP 连接** 中，通过 **流式（Streaming）** 的方式，可以多次发送响应（chunks），实现服务器向客户端的实时推送
+4. 客户端通过 `Mcp-Session-Id` 和 `request_id` 来匹配和处理异步返回的结果
+
+关键特性
+
+1. **单一端点**： 所有请求都通过 `/mcp` 处理，简洁明了
+2. **双向流支持**： 兼容 HTTP/1.1 的chunked和 HTTP/2的Stream，实现高效的双向通信
+3. **断线续传与会话保持**： 提升长连接场景下的稳定性。
+4. **标准鉴权**： 可利用标准的HTTP Header进行身份验证和授权
+
+### SSE
+
+在 Streamable HTTP 成熟之前，SSE (Server-Sent Events) 是 MCP 支持的一种远程通信方式。它基于 HTTP，但只支持服务器向客户端的单向推送.
 
 # 参考
 
