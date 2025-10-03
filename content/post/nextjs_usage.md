@@ -307,7 +307,6 @@ export default async function Page() {
 
 > 默认情况下，`fetch`响应不会被缓存，但是`Next.js`会预渲染路由，并将输出缓存以提高性能；如果需要启动动态渲染（dynamic rendering）,需要使用`{cache: 'no-store'}`选项。
 
-
 2. ORM或者数据库
 
 由于Server Components在服务器上渲染，所以可以安全的使用ORM或者数据库, 将组件转换为异步函数并等待调用。
@@ -331,25 +330,6 @@ export default async function Page() {
 Client Components获取数据的方式:
 
 1. 使用`use` hook
-
-
-## 8. React知识拾遗
-
-### 8.1 `Suspense`
-
-OAuth服务配置
-
-Github: 申请地址 [github developer settings](https://github.com/settings/developers), 回调地址参考下方进行配置。
-
-默认的回调地址URL应该是类似：`[origin]/api/auth/callback/[provider]`的格式，例如：
-
-```javascript
-// Local
-http://localhost:3000/api/auth/callback/github
- 
-// Prod
-https://app.company.com/api/auth/callback/github
-```
 
 ## 5. Shadcn
 
