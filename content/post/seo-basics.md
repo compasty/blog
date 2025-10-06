@@ -59,19 +59,90 @@ SEO包含五个主要步骤：
 1. Search Volume: 搜索量。需要注意：（a）这个值是搜索次数，而不是搜索人数（b）不等于你的网站能获得的访问量，即使排位第一，也通常获得不超过30%的流量（c）这是阶段平均值，有的关键词不同时间流量不同
 2. Keyword Difficulty: 关键词难度。
 
-# Google网站提交
+# 技术SEO: Technical SEO
 
-可以将网站提交到[Google Search Console](https://search.google.com/search-console/about)使Google搜索引擎进行检索
+## 常见优化
 
-# Google Analytics
+1. 使用HTTPS
+2. 查找并修复重复内容
+3. 确保用户和爬虫只访问网站的一个版本：也就是不要让`https://yourwebsite.com`和`https://www.yourwebsite.com`不要同时出现在索引中，建议使用一个版本然后将另一个版本重定向到主网站上。
+4. 提高页面访问速度: 常见的优化方式有压缩图像（使用ShortPixel等优化工具）、使用CDN, 压缩HTML/CSS/JS文件等
+5. 确保移动访问体验：Google是移动索引优先mobile-first indexing
+6. 使用Breadcrumb导航：breadcrumb是文本链接的轨迹，可向用户显示他们在网站上的位置以及他们如何到达该点
+7. 分页Pagination代替无限滚动：方便google加载
+8. 使用结构化标记structured data markups：<https://developers.google.com/search/docs/appearance/structured-data/search-gallery>
+9. 如果网站有多语言内容，需要使用[hreflang tags](https://www.semrush.com/blog/hreflang-attribute-101/)
 
-# 站内优化
+## Core Web Vitals
+
+参考：<https://developers.google.com/search/blog/2020/11/timing-for-page-experience>
+
+Core Web Vitals 是 Google 用来衡量用户体验的速度指标，这些指标包括：
+
+1. LCP(Largest Contentful Paint): 计算网页为用户 加载其最大元素所花费的时间, 建议**2.5 秒或更短**
+2. FID(First Input Delay): 衡量对用户与网页的首次交互做出反应所需的时间，建议**100 毫秒或更短**
+3. CLS(Cumulative Layout Shift): 测量网页上各种元素的布局的意外偏移，建议**0.1 或更低**
 
 ## sitemap&robots.txt
 
 sitemap列出了网站上希望搜索引擎希望索引的重要页面， 通常位于如下位置：`[site.com]/sitemap.xml`或者`[site.com]/sitemap_index.html`。
 
+## Meta viewport tags
+
+## hreflang-attribute
+
+## Canonical URL
+
+<https://www.semrush.com/blog/canonical-url-guide/>
+
+## 常见google命令
+
+### `site:`命令
+
+1. `site:`接网站名可以查看索引的页面数量：例如`site:www.semrush.com`
+
+![Site command with site name](/images/tech/site_cmd_whole.png)
+
+2. `site:`接详细URL可以确认对应页面是否被索引, 例如：`site:www.semrush.com/blog/what-is-seo`
+
+![Site command with specific url](/images/tech/site_cmd_specific_url.png)
+
+常见问题
+
+1. 孤立页面orphaned pages:
+
+# Google相关操作
+
+## GSC提交
+
+可以将网站提交到[Google Search Console](https://search.google.com/search-console/about)使Google搜索引擎进行检索
+
+这个网站可以查看“Core Web Vitals” report
+
+[Submit Sitemap](https://www.semrush.com/blog/submit-sitemap-to-google/)
+
+## Google PageSpeed Insights
+
+<https://pagespeed.web.dev/>
+
+除了查看访问速度，还可以查看网站是否适合移动访问，例如：
+
+1. Meta viewport tags: 告诉浏览器如何控制页面可见区域大小的代码
+2. 清晰的字体大小
+3. 按钮和可点击元素周围是否有足够的间距等
+
+![PageSpeed insights mobile detections](/images/tech/psi_mobile_detect.png)
+
+## Google Analytics
+
+# 外链建设
+
 # 常用网站和插件
+
+## Semrush
+
+1. 站点审核工具[SiteAudit](https://www.semrush.com/siteaudit/): 审查识别网站中的技术性SEO问题：如重复内容，孤立页面等
+2. 页面SEO检查器[On Page SEO Checker](https://www.semrush.com/on-page-seo-checker/)
 
 ## Yoast
 
