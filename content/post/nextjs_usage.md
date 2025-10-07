@@ -56,10 +56,21 @@ App Router示例:
   /blog
     /[id]
       /page.tsx       // 动态路由 /blog/:id
+  /(auth)             
+    /login            // 路由 /login
+      /page.tsx
+    /register
+      /page.tsx
   /layout.tsx         // 共享布局
 ```
 
 > 目前最新版本的nextjs推荐使用App Router的方式, 本文后续也以App Router的方式进行介绍
+
+Next.js使用约定式路由：
+
+1. 基础规则: 文件名称和嵌套层级自动映射为URL地址，只有目录下直接包含page文件才会识别为路由
+2. 路由组: 通过`(xxx)`语法创建路由组，不会转换为路径，可用于对路由进行分组管理，例如同组路由使用同一套布局
+3. 动态路由: 通过`[xxx]`语法可以让多个不同参数的 URL 复用同一个页面，比如 `app/question/[questionId]/page.tsx` 中 questionId 就是动态路由参数，可以匹配 `/question/1`、`/question/2` 等 URL 地址
 
 ### 1.3 Layout
 
